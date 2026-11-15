@@ -33,6 +33,11 @@
         margin-top: 0;
       }
 
+      main:has(details[open]) {
+        width: min(96%, 80rem);
+        padding: clamp(1rem, 4vw, 2.5rem);
+      }
+
       p {
         color: #6b5a4e;
       }
@@ -75,8 +80,67 @@
         cursor: pointer;
       }
 
-      #cookie-instructions ul {
+      #cookie-instructions figure {
+        margin: 1.5rem 0 0;
         text-align: left;
+      }
+
+      #cookie-instructions figcaption {
+        font-weight: 700;
+        font-size: 1.25rem;
+        line-height: 1.5;
+      }
+
+      #cookie-instructions img {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin-top: 0.75rem;
+        border-radius: 0.5rem;
+      }
+
+      .screenshot-button,
+      .screenshot-button:hover {
+        display: block;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        background: transparent;
+        cursor: zoom-in;
+      }
+
+      #screenshot-viewer {
+        box-sizing: border-box;
+        width: 96vw;
+        max-width: none;
+        max-height: 95dvh;
+        padding: 1rem;
+        border: 0;
+        border-radius: 0.6rem;
+      }
+
+      #screenshot-viewer::backdrop {
+        background: rgb(0 0 0 / 75%);
+      }
+
+      #screenshot-viewer form {
+        position: sticky;
+        top: -1rem;
+        padding-bottom: 0.75rem;
+        background: white;
+        text-align: right;
+      }
+
+      #screenshot-viewer button {
+        margin-top: 0;
+      }
+
+      #screenshot-viewer img {
+        display: block;
+        width: auto;
+        min-width: 100%;
+        max-width: none;
+        height: auto;
       }
     </style>
   </head>
@@ -87,18 +151,49 @@
       <p id="status" role="status" aria-live="polite"></p>
       <details id="cookie-instructions" hidden>
         <summary>show instructions for viewing your cookie</summary>
-        <ul>
-        <li>Right-click this page and choose Inspect (or press Ctrl+Shift+I)</li>
-        <li>Choose the "Application" tab which appears in at the top of the page. You may need to press the '>>' icon to see all the tabs. </li>
-        <li>In the left panel, under "storage", click Cookies, then choose "https://awandke.github.io/Cookies/".</li>
-        </ul>
+        <p>Click a picture to see it larger.</p>
+        <figure>
+          <figcaption>1. Right-click this page and choose Inspect (or press Ctrl+Shift+I).</figcaption>
+          <button class="screenshot-button" type="button" aria-label="Enlarge the Inspect screenshot">
+            <img src="inspect.png" alt="Right-click menu with a red arrow pointing to Inspect." loading="lazy" />
+          </button>
+        </figure>
+        <figure>
+          <figcaption>2. Choose the "Application" tab at the top of the panel. You may need to click the &gt;&gt; icon to see all the tabs.</figcaption>
+          <button class="screenshot-button" type="button" aria-label="Enlarge the Application screenshot">
+            <img src="application.png" alt="Red arrows pointing to the Application tab and the extra tabs icon." loading="lazy" />
+          </button>
+        </figure>
+        <figure>
+          <figcaption>3. In the left panel, under "Storage", click Cookies, then choose "https://awandke.github.io".</figcaption>
+          <button class="screenshot-button" type="button" aria-label="Enlarge the Cookies screenshot">
+            <img src="cookies.png" alt="Red arrow pointing to Cookies, with the site listed below it." loading="lazy" />
+          </button>
+        </figure>
       </details>
     </main>
+
+    <dialog id="screenshot-viewer" aria-label="Enlarged screenshot">
+      <form method="dialog"><button type="submit">Close picture</button></form>
+      <img alt="" />
+    </dialog>
 
     <script>
       const button = document.querySelector("#create-cookie");
       const status = document.querySelector("#status");
       const instructions = document.querySelector("#cookie-instructions");
+      const screenshotViewer = document.querySelector("#screenshot-viewer");
+      const enlargedImage = screenshotViewer.querySelector("img");
+
+      document.querySelectorAll(".screenshot-button").forEach((trigger) => {
+        trigger.addEventListener("click", () => {
+          const screenshot = trigger.querySelector("img");
+          enlargedImage.src = screenshot.src;
+          enlargedImage.alt = screenshot.alt;
+          screenshotViewer.showModal();
+          screenshotViewer.scrollTo(0, 0);
+        });
+      });
 
       button.addEventListener("click", () => {
         document.cookie = "CookiesForJames=Happy Birthday!; max-age=604800; path=/; SameSite=Lax";
